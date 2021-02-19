@@ -1,9 +1,9 @@
 import { Router } from 'express';
-import StudentsRouter from './students/StudentsRouter';
+import hotelRouter from '../hotel/hotel.router';
 
 class MasterRouter {
     private _router = Router();
-    private _studentsRouter = StudentsRouter;
+    private _hotelRouter = hotelRouter;
 
     get router() {
         return this._router;
@@ -14,7 +14,7 @@ class MasterRouter {
     }
 
     private _configure() {
-        this._router.use('/students', this._studentsRouter);
+        this._router.use('/hotel', this._hotelRouter)
     }
 }
 

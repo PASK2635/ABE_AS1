@@ -3,7 +3,6 @@ import express, { Request, Response, NextFunction } from 'express';
 import ErrorHandler from './models/ErrorHandler';
 import MasterRouter from './routers/MasterRouter';
 import mongoose from "mongoose";
-import Student from './models/student.model';
 
 dotenv.config({
     path: '.env',
@@ -25,14 +24,11 @@ server.app.use(express.json());
 server.app.use(express.urlencoded({ extended: true }));
 
 // Connect to MongoDB
-mongoose.connect(`${process.env.MONGO_URI || 'mongodb://localhost:27017/ABE_lab2c'}`, {
+mongoose.connect(`${process.env.MONGO_URI || 'mongodb://localhost:27017/ABE_Aflevering1'}`, {
     useCreateIndex: true,
     useNewUrlParser: true,
     useUnifiedTopology: true,
 });
-
-const student = new Student({ name: 'Nikolaj', grade: 7 });
-student.save();
 
 // Make server app handle any route starting with '/api'
 server.app.use('/api', server.router);
