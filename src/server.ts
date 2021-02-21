@@ -2,7 +2,9 @@ import dotenv from 'dotenv';
 import express, { Request, Response, NextFunction } from 'express';
 import ErrorHandler from './models/ErrorHandler';
 import MasterRouter from './routers/MasterRouter';
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
+import bodyParser from 'body-parser';
+import cookieParser from 'cookie-parser';
 
 dotenv.config({
     path: '.env',
@@ -20,8 +22,9 @@ class Server {
 // Initialize server app
 const server = new Server();
 
-server.app.use(express.json());
+server.app.use(bodyParser.json());
 server.app.use(express.urlencoded({ extended: true }));
+server.app.use(cookieParser());
 
 // Connect to MongoDB
 mongoose.connect(`${process.env.MONGO_URI || 'mongodb://localhost:27017/ABE_Aflevering1'}`, {
