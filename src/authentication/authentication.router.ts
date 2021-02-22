@@ -21,14 +21,17 @@ class HotelRouter {
         try {
           const { username, password } = req.body;
 
-          const jwt = await this._controller.authenticate(username, password);
+          const result = await this._controller.authenticate(
+            username,
+            password
+          );
 
-          if (jwt == null) {
+          if (result == null) {
             res
               .status(StatusCodes.UNAUTHORIZED)
               .json("Wrong username or password");
           } else {
-            res.status(StatusCodes.OK).json(jwt);
+            res.status(StatusCodes.OK).json(result);
           }
         } catch (error) {
           next(error);
@@ -36,28 +39,45 @@ class HotelRouter {
       }
     );
 
-    this._router.get(
+    this._router.post(
       "/register",
       async (req: Request, res: Response, next: NextFunction) => {
         try {
-          await this._controller.register();
+          const { username, password } = req.body;
 
-          // TODO: Should return user email
-          res.status(StatusCodes.OK).json();
+          const result = await this._controller.register(username, password);
+
+          if (result == null) {
+            // Is this a big no-no?
+            res
+              .status(StatusCodes.CONFLICT)
+              .json("A user with that username already exists");
+          } else {
+            res.status(StatusCodes.OK).json(result);
+          }
         } catch (error) {
           next(error);
         }
       }
     );
 
-    this._router.get(
+    this._router.post(
       "/refresh",
       async (req: Request, res: Response, next: NextFunction) => {
         try {
-          await this._controller.refresh();
+          const { authorization } = req.headers;
 
-          // TODO: Should return new token
-          res.status(StatusCodes.OK).json();
+          if (authorization == null) {
+            res.status(StatusCodes.UNAUTHORIZED);
+          } else {
+            const result = await this._controller.refresh(authorization);
+
+            if (result == null) {
+              res.status(StatusCodes.UNAUTHORIZED).json();
+            } else {
+              res.status(StatusCodes.OK).json(result);
+            }
+          }
         } catch (error) {
           next(error);
         }
