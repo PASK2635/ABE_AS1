@@ -1,13 +1,14 @@
-import dotenv from 'dotenv';
-import express, { Request, Response, NextFunction } from 'express';
-import ErrorHandler from './models/ErrorHandler';
-import MasterRouter from './routers/MasterRouter';
-import mongoose from 'mongoose';
-import bodyParser from 'body-parser';
-import cookieParser from 'cookie-parser';
+import dotenv from "dotenv";
+import express, { Request, Response, NextFunction } from "express";
+import ErrorHandler from "./models/ErrorHandler";
+import MasterRouter from "./routers/MasterRouter";
+import mongoose from "mongoose";
+import bodyParser from "body-parser";
+import cookieParser from "cookie-parser";
+import seedAdminUser from "./utilities/seed";
 
 dotenv.config({
-    path: '.env',
+  path: ".env",
 });
 
 /**
@@ -15,8 +16,8 @@ dotenv.config({
  * @description Will later contain the routing system.
  */
 class Server {
-    public app = express();
-    public router = MasterRouter;
+  public app = express();
+  public router = MasterRouter;
 }
 
 // Initialize server app
@@ -27,26 +28,33 @@ server.app.use(express.urlencoded({ extended: true }));
 server.app.use(cookieParser());
 
 // Connect to MongoDB
-mongoose.connect(`${process.env.MONGO_URI || 'mongodb://localhost:27017/ABE_Aflevering1'}`, {
+mongoose.connect(
+  `${process.env.MONGO_URI || "mongodb://localhost:27017/ABE_Aflevering1"}`,
+  {
     useCreateIndex: true,
     useNewUrlParser: true,
     useUnifiedTopology: true,
-});
+  }
+);
+
+// Seed admin user into database
+seedAdminUser();
 
 // Make server app handle any route starting with '/api'
-server.app.use('/api', server.router);
+server.app.use("/api", server.router);
 
 // Make server app handle any error
-server.app.use((err: ErrorHandler, req: Request, res: Response, next: NextFunction) => {
+server.app.use(
+  (err: ErrorHandler, req: Request, res: Response, next: NextFunction) => {
     res.status(err.statusCode || 500).json({
-        status: 'error',
-        statusCode: err.statusCode,
-        message: err.message,
+      status: "error",
+      statusCode: err.statusCode,
+      message: err.message,
     });
-});
-
+  }
+);
 
 // Make server listen on some port
 ((port = process.env.APP_PORT || 5000) => {
-    server.app.listen(port, () => console.log(`> Listening on port ${port}`));
+  server.app.listen(port, () => console.log(`> Listening on port ${port}`));
 })();

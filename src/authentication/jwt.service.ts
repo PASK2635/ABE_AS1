@@ -42,24 +42,15 @@ class JwtService {
   }
 
   verifyAccessToken(accessToken: string) {
-    try {
-      return jwt.verify(accessToken, String(process.env.ACCESS_TOKEN_SECRET));
-    } catch (_) {
-      return null;
-    }
+    return jwt.verify(accessToken, String(process.env.ACCESS_TOKEN_SECRET));
   }
 
   verifyRefreshToken(refreshToken: string) {
-    try {
-      const result = jwt.verify(
-        refreshToken,
-        String(process.env.REFRESH_TOKEN_SECRET)
-      );
-      console.log(result);
-      return result;
-    } catch (err) {
-      return null;
-    }
+    return jwt.verify(refreshToken, String(process.env.REFRESH_TOKEN_SECRET));
+  }
+
+  decode(token: any): any {
+    return jwt.decode(token);
   }
 
   getUserIdFromAuthorizationHeader(authorization: string) {

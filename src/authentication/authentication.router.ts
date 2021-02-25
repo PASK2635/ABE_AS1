@@ -2,7 +2,7 @@ import { NextFunction, Request, Response, Router } from "express";
 import { StatusCodes } from "http-status-codes";
 import AuthenticationController from "./authentication.controller";
 
-class HotelRouter {
+class AuthenticationRouter {
   private _router = Router();
   private _controller = AuthenticationController;
 
@@ -26,15 +26,9 @@ class HotelRouter {
             password
           );
 
-          if (result == null) {
-            res
-              .status(StatusCodes.UNAUTHORIZED)
-              .json("Wrong username or password");
-          } else {
-            res.status(StatusCodes.OK).json(result);
-          }
+          res.status(StatusCodes.OK).json(result);
         } catch (error) {
-          next(error);
+          res.status(StatusCodes.UNAUTHORIZED).json(error);
         }
       }
     );
@@ -47,16 +41,9 @@ class HotelRouter {
 
           const result = await this._controller.register(username, password);
 
-          if (result == null) {
-            // Is this a big no-no?
-            res
-              .status(StatusCodes.CONFLICT)
-              .json("A user with that username already exists");
-          } else {
-            res.status(StatusCodes.OK).json(result);
-          }
+          res.status(StatusCodes.OK).json(result);
         } catch (error) {
-          next(error);
+          res.status(StatusCodes.CONFLICT).json(error);
         }
       }
     );
@@ -67,23 +54,15 @@ class HotelRouter {
         try {
           const { authorization } = req.headers;
 
-          if (authorization == null) {
-            res.status(StatusCodes.UNAUTHORIZED);
-          } else {
-            const result = await this._controller.refresh(authorization);
+          const result = await this._controller.refresh(authorization);
 
-            if (result == null) {
-              res.status(StatusCodes.UNAUTHORIZED).json();
-            } else {
-              res.status(StatusCodes.OK).json(result);
-            }
-          }
+          res.status(StatusCodes.OK).json(result);
         } catch (error) {
-          next(error);
+          res.status(StatusCodes.UNAUTHORIZED).json(error);
         }
       }
     );
   }
 }
 
-export = new HotelRouter().router;
+export = new AuthenticationRouter().router;

@@ -1,7 +1,6 @@
-import IUser from "../user/user.interface";
 import User from "../user/user.model";
-import bcrypt from "bcrypt";
 import JwtService from "./jwt.service";
+import AuthenticationService from "./authentication.service";
 import { Role } from "../user/user.roles";
 
 class AuthenticationController {
@@ -9,77 +8,70 @@ class AuthenticationController {
     const user = await User.findOne({ username });
 
     if (user == null) {
-      // TODO: Should return an error object with a message
-      return null;
+      throw new Error("Invalid username or password");
     }
 
-    try {
-      const same = await bcrypt.compare(password, user.passwordHash);
+    const valid = await AuthenticationService.validatePasswordAsync(
+      password,
+      user.passwordHash
+    );
 
-      if (same) {
-        const payload = { sub: user._id, username, role: user.role };
-
-        const accessToken = JwtService.generateAccessToken(payload);
-
-        const refreshToken = JwtService.generateRefreshToken(payload);
-
-        await User.updateOne({ username }, { refreshToken });
-
-        return accessToken;
-      }
-
-      // TODO: Should return an error object with a message
-      return null;
-    } catch (err) {
-      throw err;
+    if (!valid) {
+      throw new Error("Invalid username or password");
     }
+
+    const payload = { sub: user._id, username, role: user.role };
+
+    const accessToken = JwtService.generateAccessToken(payload);
+
+    const refreshToken = JwtService.generateRefreshToken(payload);
+
+    await User.updateOne({ username }, { refreshToken });
+
+    return accessToken;
   }
 
   async register(username: string, password: string) {
     const userExists = await User.findOne({ username });
 
     if (userExists != null) {
-      // TODO: Should return an error object with a message
-      return null;
+      throw new Error("A user with that username already exists");
     }
 
-    try {
-      const passwordHash = await bcrypt.hash(
-        password,
-        Number(process.env.BCRYPT_SALT_ROUNDS)
-      );
+    const passwordHash = await AuthenticationService.hashPasswordAsync(
+      password
+    );
 
-      const newUser = { role: Role.User, username, passwordHash };
+    const newUser = { role: Role.User, username, passwordHash };
 
-      const createdUser = await User.create(newUser);
+    const createdUser = await User.create(newUser);
 
-      return { id: createdUser._id, username: createdUser.username };
-    } catch (err) {
-      throw err;
-    }
+    return { id: createdUser._id, username: createdUser.username };
   }
 
-  async refresh(authorizationHeader: string) {
+  async refresh(authorizationHeader: string | undefined) {
+    if (authorizationHeader == undefined) {
+      throw new Error("Invalid user data");
+    }
+
     const userId = JwtService.getUserIdFromAuthorizationHeader(
       authorizationHeader
     );
 
     if (userId == null) {
-      // TODO: Should return an error object with a message
-      return null;
+      throw new Error("Invalid user data");
     }
 
     const user = await User.findOne({ _id: userId });
 
     if (user == null || user.refreshToken == null) {
-      // TODO: Should return an error object with a message
-      return null;
+      throw new Error("Invalid user data");
     }
 
     const result = JwtService.verifyRefreshToken(user.refreshToken);
 
     if (result == null) {
-      return null;
+      throw new Error("Invalid user data");
     }
 
     const payload = { sub: user._id, username: user.username, role: user.role };

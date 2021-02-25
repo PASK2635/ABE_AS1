@@ -2,20 +2,26 @@ import IHotel from "./hotel.interface";
 import Hotel from "./hotel.model";
 
 class HotelController {
-  async create(hotel: IHotel) {
-    return await Hotel.create(hotel);
+  async createAsync(hotel: IHotel) {
+    const hotelExists = await Hotel.findOne({ name: hotel.name });
+
+    if (hotelExists != null) {
+      throw new Error("A hotel with that name already exists");
+    }
+
+    return Hotel.create(hotel);
   }
 
-  async getAll() {
-    return await Hotel.find({});
+  async getAllAsync() {
+    return Hotel.find({});
   }
 
-  async getByName(hotelName: string) {
-    return await Hotel.findOne({ name: hotelName });
+  async getByNameAsync(hotelName: string) {
+    return Hotel.findOne({ name: hotelName });
   }
 
-  async deleteByName(hotelName: string) {
-    return await Hotel.deleteOne({ name: hotelName });
+  async deleteByNameAsync(hotelName: string) {
+    return Hotel.deleteOne({ name: hotelName });
   }
 }
 
