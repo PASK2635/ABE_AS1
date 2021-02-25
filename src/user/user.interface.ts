@@ -1,12 +1,9 @@
-export default interface IUser extends Document {
-    role:Role;
-    userName:string;
-    passwordHash:string;
-}
+import { Role } from "./user.roles";
 
-enum Role{
-    User = 'User',
-    Guest = 'Guest',
-    Manager = 'Manager',
-    Admin = 'Admin'
+export default interface IUser extends Document {
+  role: Role;
+  username: string;
+  passwordHash: string;
+  // Optional - refreshToken is not set on register, so it must be optional
+  refreshToken?: string;
 }
