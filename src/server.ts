@@ -6,15 +6,17 @@ import mongoose from "mongoose";
 import bodyParser from "body-parser";
 import cookieParser from "cookie-parser";
 import seedAdminUser from "./utilities/seed";
+import { DocBuilder } from "doctopus";
+import swaggerUi from "swagger-ui-express";
+import { HotelController } from "./hotel/hotel.controller"
+import { AuthenticationController } from "./authentication/authentication.controller";
+import { UserController } from "./user/user.controller";
+import { RoomController } from "./room/room.controller";
 
 dotenv.config({
   path: ".env",
 });
 
-/**
- * Express server application class.
- * @description Will later contain the routing system.
- */
 class Server {
   public app = express();
   public router = MasterRouter;
@@ -26,6 +28,14 @@ const server = new Server();
 server.app.use(bodyParser.json());
 server.app.use(express.urlencoded({ extended: true }));
 server.app.use(cookieParser());
+
+const docs = new DocBuilder();
+
+docs.set('title', 'ABE assignment 1 app');
+
+docs.set("swagger", "2.0.0");
+
+docs.setSecurityDefinition("Bearer", { in: "header", name: "Authorization", type: "apiKey" });
 
 // Connect to MongoDB
 mongoose.connect(
@@ -42,6 +52,16 @@ seedAdminUser();
 
 // Make server app handle any route starting with '/api'
 server.app.use("/api", server.router);
+
+// Use decorated controllers for swagger documentation
+docs.use(HotelController);
+docs.use(RoomController);
+docs.use(AuthenticationController);
+docs.use(UserController);
+
+const swaggerDocument = docs.build();
+
+server.app.use("/swagger", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 // Make server app handle any error
 server.app.use(

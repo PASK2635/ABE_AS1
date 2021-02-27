@@ -1,6 +1,5 @@
 import * as mongoose from "mongoose";
 import IUser from "./user.interface";
-import { Role } from "./user.roles";
 
 const userSchema = new mongoose.Schema({
   username: {
@@ -8,10 +7,13 @@ const userSchema = new mongoose.Schema({
     required: true,
   },
   role: {
-    type: Role,
+    type: String,
     required: true,
   },
-  passwordHash: String,
+  passwordHash: {
+    type: String,
+    required: true,
+  },
   refreshToken: String,
 });
 

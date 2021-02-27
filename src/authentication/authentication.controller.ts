@@ -2,8 +2,30 @@ import User from "../user/user.model";
 import JwtService from "./jwt.service";
 import AuthenticationService from "./authentication.service";
 import { Role } from "../user/user.roles";
+import { Doc, group, param, post, response, route } from "doctopus";
 
-class AuthenticationController {
+@group("Authentication")
+export class AuthenticationController {
+  @post
+  @route("/api/authenticate")
+  @param({
+    in: "body",
+    name: "User",
+    schema: Doc.object({
+      example: {
+        username: "username",
+        password: "password",
+      }
+    }),
+  })
+  @response({
+    description: "POST - login",
+    schema: Doc.string({
+      example: {
+        accessToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c",
+      },
+    })
+  })
   async authenticate(username: string, password: string) {
     const user = await User.findOne({ username });
 
@@ -31,6 +53,27 @@ class AuthenticationController {
     return accessToken;
   }
 
+  @post
+  @route("/api/register")
+  @param({
+    in: "body",
+    name: "User",
+    schema: Doc.object({
+      example: {
+        username: "username",
+        password: "password",
+      }
+    }),
+  })
+  @response({
+    description: "POST - register",
+    schema: Doc.string({
+      example: {
+        id: "id",
+        username: "username",
+      },
+    })
+  })
   async register(username: string, password: string) {
     const userExists = await User.findOne({ username });
 
@@ -49,6 +92,16 @@ class AuthenticationController {
     return { id: createdUser._id, username: createdUser.username };
   }
 
+  @post
+  @route("/api/refresh")
+  @response({
+    description: "POST - refresh",
+    schema: Doc.string({
+      example: {
+        accessToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c",
+      },
+    })
+  })
   async refresh(authorizationHeader: string | undefined) {
     if (authorizationHeader == undefined) {
       throw new Error("Invalid user data");
@@ -86,4 +139,4 @@ class AuthenticationController {
   }
 }
 
-export = new AuthenticationController();
+export default new AuthenticationController();
