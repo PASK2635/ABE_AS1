@@ -103,7 +103,7 @@ export class RoomController {
     schema: Doc.arrayOf(Doc.object(m2s(Room)))
   })
   async getAvailableRoomsByHotelId(hotelId: string) {
-    return Room.find({ hotelId: hotelId, isReserved: false });
+    return Room.find({ hotelName: hotelId, isReserved: false });
   }
 }
 

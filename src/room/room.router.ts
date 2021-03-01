@@ -76,13 +76,15 @@ class RoomRouter {
 
                     const newRoom: IRoom = { ...req.body };
 
-                    const hotelId = newRoom.hotelId;
-                    if (hotelId == undefined) {
+                    const hotelName = newRoom.hotelName;
+                    if (hotelName == undefined) {
                         throw new Error();
                     }
-                    const managerId = (await this._hotelController.getByNameAsync(hotelId))?.createdBy;
+
+                    const managerId = (await this._hotelController.getByNameAsync(hotelName))?.createdBy;
 
                     const userID = JwtService.getUserIdFromAuthorizationHeader(auth);
+
                     if (!userID || userID != managerId) {
                         throw new Error();
                     }
@@ -100,11 +102,15 @@ class RoomRouter {
             "/reserve/:roomNumber",
             async (req: Request, res: Response, next: NextFunction) => {
                 try {
-                    await this._controller.reserveRoomByNumber(Number(req.params.roomNumber));
+                    const room = await this._controller.reserveRoomByNumber(Number(req.params.roomNumber));
 
                     const { username } = req.body;
 
-                    const room = await this._userController.updateUserRoleByName(username, Role.Guest);
+                    if (username == null) {
+                        throw new Error("Username not specified");
+                    }
+
+                    await this._userController.updateUserRoleByName(username, Role.Guest);
                     res.status(StatusCodes.OK).json(room);
                 }
                 catch (error) {
@@ -118,7 +124,7 @@ class RoomRouter {
             AuthorizationService.isManager,
             async (req: Request, res: Response, next: NextFunction) => {
                 try {
-                    const hotelId = (await this._controller.getByNumberAsync(Number(req.params.roomNumber)))?.hotelId;
+                    const hotelId = (await this._controller.getByNumberAsync(Number(req.params.roomNumber)))?.hotelName;
                     if (hotelId == undefined) {
                         throw new Error();
                     }

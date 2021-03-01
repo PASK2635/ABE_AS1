@@ -1,0 +1,25 @@
+version: "3.9"
+services:
+  api:
+    build: .
+    ports:
+      - "80:3000"
+    links:
+      - api_db
+    environment:
+      - ACCESS_TOKEN_SECRET=jkfeuh375394hjfdjsb38fbhjdskjh
+      - ACCESS_TOKEN_LIFE=86400
+      - REFRESH_TOKEN_SECRET=dksajnnnngj82nfjhnjfe882bfnbfd88
+      - REFRESH_TOKEN_LIFE=604800
+      - BCRYPT_SALT_ROUNDS=10
+      - ADMIN_USERNAME=admin
+      - ADMIN_PASSWORD=password
+      - MONGO_URI=mongodb://api_db:27017/ABE_aflevering_1
+      - APP_PORT=3000
+  api_db:
+    container_name: api_db
+    image: mongo
+    volumes:
+      - ./db:/data/db
+    ports:
+      - "27017:27017"
