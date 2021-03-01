@@ -1,1 +1,0 @@
-{"version":3,"file":"hotel.model.js","sourceRoot":"","sources":["../../src/hotel/hotel.model.ts"],"names":[],"mappings":";;;;;;;;;;;;;;;;;;;;;AAAA,mDAAqC;AAGrC,MAAM,WAAW,GAAG,IAAI,QAAQ,CAAC,MAAM,CAAC;IACpC,IAAI,EAAE;QACF,IAAI,EAAC,MAAM;QACX,QAAQ,EAAC,IAAI;KAChB;CACJ,CAAC,CAAC;AAEH,MAAM,KAAK,GAAG,QAAQ,CAAC,KAAK,CAA6B,OAAO,EAAC,WAAW,CAAC,CAAC;AAE9E,kBAAe,KAAK,CAAC"}

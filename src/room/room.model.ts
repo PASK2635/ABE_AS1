@@ -10,9 +10,9 @@ const roomSchema = new mongoose.Schema({
         type: Boolean,
         required: true,
     },
-    hotelId:{
-        type: String, 
-        required:true
+    hotelName: {
+        type: String,
+        required: true
     }
 });
 

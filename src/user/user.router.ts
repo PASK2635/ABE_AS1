@@ -17,13 +17,13 @@ class UserRouter {
 
   private configure() {
     this.router.put(
-      "/",
+      "/role",
       AuthorizationService.isAdmin,
       async (req: Request, res: Response, next: NextFunction) => {
         try {
           const { username, role } = req.body;
 
-          this._controller.updateUserRole(username, role);
+          this._controller.updateUserRoleByName(username, role);
 
           res
             .status(StatusCodes.OK)
